@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silk Road | Telegram Accounts Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --dark: #1a1a2e;
+            --light: #f1f1f1;
+            --danger: #ff4757;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark); 
+            color: var(--light); 
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 0; 
+            border-bottom: 1px solid #333; 
+        }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary); }
+        nav a { color: var(--light); margin-left: 15px; text-decoration: none; }
+        .btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: 0.3s; 
+        }
+        .btn:hover { opacity: 0.8; }
+        .account-card { 
+            background: #16213e; 
+            padding: 20px; 
+            margin: 15px 0; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            transition: 0.3s; 
+        }
+        .account-card:hover { transform: translateY(-5px); }
+        .account-card h3 { color: var(--primary); }
+        .price { font-weight: bold; margin: 10px 0; }
+        .seller { color: #aaa; font-size: 14px; }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.8); 
+            z-index: 1000; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal-content { 
+            background: var(--dark); 
+            padding: 20px; 
+            border-radius: 10px; 
+            max-width: 500px; 
+            width: 90%; 
+        }
+        .close-modal { 
+            float: right; 
+            cursor: pointer; 
+            font-size: 24px; 
+        }
+        footer { 
+            text-align: center; 
+            padding: 20px; 
+            margin-top: 50px; 
+            border-top: 1px solid #333; 
+        }
+        .privacy-link { color: var(--primary); cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🔹 Silk Road</div>
+            <nav>
+                <a href="#add-product">Добавить товар</a>
+                <a href="#admin" id="admin-link" style="display: none;">Админ-панель</a>
+                <a href="#" class="privacy-link">Политика конфиденциальности</a>
+            </nav>
+        </header>
+
+        <main>
+            <h1>🛒 Магазин Telegram-аккаунтов</h1>
+            <p>Покупайте и продавайте аккаунты безопасно.</p>
+
+            <div id="account-list">
+                <!-- Тут будут карточки товаров -->
+            </div>
+
+            <button id="add-product-btn" class="btn">➕ Добавить свой товар</button>
+        </main>
+
+        <footer>
+            <p>© 2024 Silk Road | <span class="privacy-link">Политика конфиденциальности</span></p>
+        </footer>
+    </div>
+
+    <!-- Модальное окно добавления товара -->
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Добавить товар</h2>
+            <form id="product-form">
+                <input type="text" placeholder="Название" required>
+                <textarea placeholder="Описание" required></textarea>
+                <input type="number" placeholder="Цена ($)" required>
+                <input type="text" placeholder="Ваш Telegram (@username)" required>
+                <button type="submit" class="btn">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно политики конфиденциальности -->
+    <div id="privacy-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>🔒 Политика конфиденциальности</h2>
+            <p><strong>Silk Road</strong> — это площадка для покупки и продажи Telegram-аккаунтов. Мы не храним ваши платежные данные и не несем ответственности за сделки между пользователями.</p>
+            <h3>Что мы собираем?</h3>
+            <ul>
+                <li>Telegram-юзернейм (для связи)</li>
+                <li>Данные товаров (название, цена)</li>
+            </ul>
+            <h3>Правила использования:</h3>
+            <ul>
+                <li>🚫 Запрещена продажа запрещенных товаров (наркотики, оружие).</li>
+                <li>🔐 Указывайте реальный Telegram для связи.</li>
+                <li>💬 Все сделки — на ответственности покупателя и продавца.</li>
+            </ul>
+            <button class="btn" id="accept-privacy">Я согласен</button>
+        </div>
+    </div>
+
+    <!-- Админ-панель (скрыта по умолчанию) -->
+    <div id="admin-panel" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>👑 Админ-панель</h2>
+            <div id="admin-products-list"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
