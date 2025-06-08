@@ -3,754 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silk Road | Digital Marketplace</title>
+    <title>Silk Road | Marketplace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6c5ce7;
-            --primary-dark: #5649c0;
-            --secondary: #00cec9;
-            --dark: #1a1a2e;
-            --darker: #0f0f1a;
-            --light: #f1f1f1;
-            --gray: #a5a5a5;
-            --danger: #ff4757;
-            --success: #2ed573;
-            --warning: #ffa502;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        body {
-            background-color: var(--dark);
-            color: var(--light);
-            line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            flex: 1;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 30px;
-        }
-        
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo i {
-            font-size: 32px;
-        }
-        
-        nav {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        
-        nav a {
-            color: var(--light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            padding: 8px 12px;
-            border-radius: 5px;
-        }
-        
-        nav a:hover {
-            background-color: rgba(108, 92, 231, 0.2);
-            color: var(--primary);
-        }
-        
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        .btn-outline:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-        }
-        
-        .btn-danger:hover {
-            background: #e84118;
-            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
-        }
-        
-        .btn-success {
-            background: var(--success);
-        }
-        
-        .btn-success:hover {
-            background: #27ae60;
-            box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
-        }
-        
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin: 30px 0;
-        }
-        
-        .product-card {
-            background: linear-gradient(145deg, #1e1e3a, #1a1a2e);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
-            border-color: var(--primary);
-        }
-        
-        .product-media {
-            height: 200px;
-            background-color: var(--darker);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .product-media img, .product-media video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .product-media .media-placeholder {
-            font-size: 50px;
-            color: var(--gray);
-        }
-        
-        .product-content {
-            padding: 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .product-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: white;
-        }
-        
-        .product-description {
-            color: var(--gray);
-            font-size: 14px;
-            margin-bottom: 15px;
-            flex: 1;
-        }
-        
-        .product-price {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 10px 0;
-        }
-        
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 15px;
-            font-size: 13px;
-            color: var(--gray);
-        }
-        
-        .product-seller {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .product-seller img {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-        }
-        
-        .product-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .product-actions .btn {
-            flex: 1;
-            padding: 10px;
-            justify-content: center;
-        }
-        
-        .product-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: var(--primary);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-content {
-            background: var(--dark);
-            border-radius: 12px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: modalFadeIn 0.3s ease;
-        }
-        
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-title {
-            font-size: 22px;
-            font-weight: 600;
-        }
-        
-        .close-modal {
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--gray);
-        }
-        
-        .close-modal:hover {
-            color: white;
-            transform: rotate(90deg);
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background: var(--darker);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
-        }
-        
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .file-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px;
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .file-upload:hover {
-            border-color: var(--primary);
-            background: rgba(108, 92, 231, 0.05);
-        }
-        
-        .file-upload i {
-            font-size: 40px;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-        
-        .file-upload input {
-            display: none;
-        }
-        
-        .preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .preview-item {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .preview-item img, .preview-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .remove-preview {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: var(--danger);
-            color: white;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        
-        .category-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .category-option {
-            padding: 8px 15px;
-            background: var(--darker);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            border: 1px solid transparent;
-        }
-        
-        .category-option:hover {
-            background: rgba(108, 92, 231, 0.2);
-        }
-        
-        .category-option.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .chat-header {
-            padding: 15px;
-            background: var(--darker);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .chat-header img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-        
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background: var(--dark);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .message {
-            max-width: 70%;
-            padding: 12px 15px;
-            border-radius: 12px;
-            position: relative;
-            animation: messageFadeIn 0.3s ease;
-        }
-        
-        @keyframes messageFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .message.sent {
-            align-self: flex-end;
-            background: var(--primary);
-            color: white;
-            border-top-right-radius: 0;
-        }
-        
-        .message.received {
-            align-self: flex-start;
-            background: var(--darker);
-            border-top-left-radius: 0;
-        }
-        
-        .message-time {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 5px;
-            text-align: right;
-        }
-        
-        .message-media {
-            margin-top: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            max-width: 100%;
-        }
-        
-        .message-media img, .message-media video {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-        }
-        
-        .message-link {
-            color: var(--secondary);
-            text-decoration: none;
-            word-break: break-all;
-        }
-        
-        .chat-input {
-            display: flex;
-            padding: 15px;
-            background: var(--darker);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            gap: 10px;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 12px 15px;
-            background: var(--dark);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            color: white;
-        }
-        
-        .chat-input button {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        
-        .chat-attachments {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .chat-attachment-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-attachment-btn:hover {
-            background: var(--primary);
-        }
-        
-        .order-confirmation {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            padding: 30px;
-        }
-        
-        .order-confirmation i {
-            font-size: 60px;
-            color: var(--success);
-            margin-bottom: 20px;
-        }
-        
-        .order-confirmation h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        .order-confirmation p {
-            margin-bottom: 25px;
-            color: var(--gray);
-        }
-        
-        .order-details {
-            width: 100%;
-            background: var(--darker);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .order-detail {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .order-detail:last-child {
-            margin-bottom: 0;
-            padding-top: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-weight: 600;
-        }
-        
-        .rating-stars {
-            display: flex;
-            gap: 5px;
-            margin: 15px 0;
-        }
-        
-        .rating-star {
-            font-size: 24px;
-            color: var(--gray);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .rating-star.active {
-            color: var(--warning);
-        }
-        
-        .marketplace-tabs {
-            display: flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-        
-        .marketplace-tab {
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-        
-        .marketplace-tab.active {
-            border-bottom-color: var(--primary);
-            color: var(--primary);
-        }
-        
-        .marketplace-tab:hover:not(.active) {
-            color: var(--gray);
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .search-filter {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .search-filter input, .search-filter select {
-            padding: 12px 15px;
-            background: var(--darker);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: white;
-            flex: 1;
-        }
-        
-        .search-filter select {
-            max-width: 200px;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: var(--gray);
-        }
-        
-        .empty-state i {
-            font-size: 50px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 30px;
-            margin-top: 50px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--gray);
-        }
-        
-        @media (max-width: 768px) {
-            .products-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            nav {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .search-filter {
-                flex-direction: column;
-            }
-            
-            .search-filter select {
-                max-width: 100%;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-<!-- В конце body, перед закрывающим тегом -->
-<script src="script.js" defer></script>
-
 <body>
     <div class="container">
         <header>
@@ -767,4 +24,213 @@
                 <button class="btn" id="auth-btn">
                     <i class="fas fa-user"></i>
                     <span id="auth-text">Войти</span>
-                </but
+                </button>
+            </nav>
+        </header>
+
+        <div class="marketplace-controls">
+            <input type="text" id="search-input" placeholder="Поиск товаров...">
+            <select id="category-filter">
+                <option value="">Все категории</option>
+                <option value="accounts">Аккаунты</option>
+                <option value="digital">Цифровые товары</option>
+                <option value="services">Услуги</option>
+                <option value="other">Другое</option>
+            </select>
+            <select id="sort-select">
+                <option value="newest">Сначала новые</option>
+                <option value="price-asc">Цена по возрастанию</option>
+                <option value="price-desc">Цена по убыванию</option>
+                <option value="rating">По рейтингу</option>
+            </select>
+            <button class="btn" id="add-product-btn" style="display: none;">
+                <i class="fas fa-plus"></i> Добавить товар
+            </button>
+        </div>
+
+        <div class="marketplace-tabs">
+            <div class="marketplace-tab active" data-tab="all">Все товары</div>
+            <div class="marketplace-tab" data-tab="categories">Категории</div>
+        </div>
+
+        <div id="products-grid" class="products-grid"></div>
+
+        <div id="category-products" class="tab-content" style="display: none;">
+            <div class="category-selector">
+                <div class="category-option" data-category="accounts">
+                    <i class="fas fa-user"></i> Аккаунты
+                </div>
+                <div class="category-option" data-category="digital">
+                    <i class="fas fa-file-code"></i> Цифровые товары
+                </div>
+                <div class="category-option" data-category="services">
+                    <i class="fas fa-handshake"></i> Услуги
+                </div>
+                <div class="category-option" data-category="other">
+                    <i class="fas fa-box"></i> Другое
+                </div>
+            </div>
+            <div id="category-products-grid" class="products-grid"></div>
+        </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div id="add-product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавить товар</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <div class="form-group">
+                        <label for="product-name">Название товара</label>
+                        <input type="text" id="product-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-category">Категория</label>
+                        <select id="product-category" class="form-control" required>
+                            <option value="">Выберите категорию</option>
+                            <option value="accounts">Аккаунты</option>
+                            <option value="digital">Цифровые товары</option>
+                            <option value="services">Услуги</option>
+                            <option value="other">Другое</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-desc">Описание</label>
+                        <textarea id="product-desc" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Цена</label>
+                        <input type="number" id="product-price" class="form-control" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-link">Ссылка для оплаты (ваш @send)</label>
+                        <input type="text" id="payment-link" class="form-control" required placeholder="https://t.me/your_send_bot">
+                    </div>
+                    <div class="form-group">
+                        <label>Медиафайлы (макс. 3)</label>
+                        <div class="file-upload" id="media-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Перетащите файлы сюда или кликните для загрузки</p>
+                            <input type="file" id="product-media" multiple accept="image/*,video/*">
+                        </div>
+                        <div class="preview-container" id="media-preview"></div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-check"></i> Добавить товар
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="view-product-title"></h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body" id="view-product-content"></div>
+        </div>
+    </div>
+
+    <div id="privacy-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Политика конфиденциальности</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Мы уважаем вашу конфиденциальность и обязуемся защищать ваши личные данные.</p>
+                <p>Наш маркетплейс использует только необходимые данные для работы сервиса.</p>
+                <button id="accept-privacy" class="btn btn-primary">Принять</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="telegram-auth-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Авторизация через Telegram</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Для входа отправьте боту @SilkRoadAuthBot следующее сообщение:</p>
+                <div class="auth-code">
+                    <code>/login <span id="auth-code"></span></code>
+                    <button class="btn btn-copy" data-target="auth-code">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <p>После подтверждения закройте это окно и обновите страницу</p>
+                <button id="check-auth-btn" class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Проверить авторизацию
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="chat-partner-info">
+                    <img id="chat-partner-avatar" src="https://via.placeholder.com/40" alt="Avatar">
+                    <div>
+                        <h3 id="chat-partner-name"></h3>
+                        <small id="chat-partner-status"></small>
+                    </div>
+                </div>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="chat-messages" class="chat-messages"></div>
+                <div class="chat-input-container">
+                    <div class="file-upload-btn" id="chat-file-upload">
+                        <i class="fas fa-paperclip"></i>
+                        <input type="file" id="chat-file-input" multiple>
+                    </div>
+                    <input type="text" id="chat-input" placeholder="Напишите сообщение...">
+                    <button id="send-message-btn" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Админ-панель</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="admin-controls">
+                    <input type="text" id="admin-search" placeholder="Поиск товаров...">
+                    <select id="admin-status-filter">
+                        <option value="all">Все товары</option>
+                        <option value="active">Активные</option>
+                        <option value="blocked">Заблокированные</option>
+                    </select>
+                </div>
+                
+                <div class="admin-stats">
+                    <p>Товаров: <span id="total-products">0</span></p>
+                    <p>Заблокировано: <span id="blocked-products">0</span></p>
+                    <p>Пользователей: <span id="total-users">0</span></p>
+                </div>
+                
+                <div id="admin-products-list" class="admin-products-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Silk Road Marketplace &copy; 2023</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
