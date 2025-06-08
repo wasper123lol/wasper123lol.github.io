@@ -1,46 +1,121 @@
 // Конфигурация маркетплейса
 const MARKETPLACE_CONFIG = {
-    name: "Silk Road",
+    name: "Silk Road Marketplace",
     adminUsername: "@ADMIN_ID1214",
-    storageKey: "silk_road_marketplace",
-    currency: "$"
+    storageKey: "silk_road_marketplace_data",
+    currency: "$",
+    maxMediaFiles: 3,
+    defaultAvatar: "https://via.placeholder.com/40"
 };
 
-// Данные маркетплейса
-let marketplaceData = {
-    products: [],
-    users: [],
-    blockedProducts: []
+// Состояние приложения
+const state = {
+    currentUser: null,
+    currentProduct: null,
+    currentChat: null,
+    currentOrder: null,
+    mediaFiles: [],
+    categories: [
+        { id: "accounts", name: "Аккаунты", icon: "fas fa-user" },
+        { id: "digital", name: "Цифровые товары", icon: "fas fa-file-code" },
+        { id: "services", name: "Услуги", icon: "fas fa-handshake" },
+        { id: "other", name: "Другое", icon: "fas fa-box" }
+    ]
 };
 
 // DOM элементы
 const elements = {
-    accountList: document.getElementById("account-list"),
-    addProductBtn: document.getElementById("add-product-btn"),
-    addProductModal: document.getElementById("add-product-modal"),
-    privacyModal: document.getElementById("privacy-modal"),
-    adminPanel: document.getElementById("admin-panel"),
-    adminLink: document.getElementById("admin-link"),
-    closeButtons: document.querySelectorAll(".close-modal"),
-    acceptPrivacyBtn: document.getElementById("accept-privacy"),
-    privacyLinks: document.querySelectorAll(".privacy-link"),
-    productForm: document.getElementById("product-form"),
+    // Основные элементы
+    productsGrid: document.getElementById("products-grid"),
+    categoryProducts: document.getElementById("category-products"),
     searchInput: document.getElementById("search-input"),
+    categoryFilter: document.getElementById("category-filter"),
     sortSelect: document.getElementById("sort-select"),
-    adminProductsList: document.getElementById("admin-products-list"),
-    totalProducts: document.getElementById("total-products"),
-    blockedProducts: document.getElementById("blocked-products")
+    addProductBtn: document.getElementById("add-product-btn"),
+    authBtn: document.getElementById("auth-btn"),
+    authText: document.getElementById("auth-text"),
+    adminLink: document.getElementById("admin-link"),
+    privacyLinks: document.querySelectorAll(".privacy-link"),
+    
+    // Модальные окна
+    modals: {
+        addProduct: document.getElementById("add-product-modal"),
+        viewProduct: document.getElementById("view-product-modal"),
+        chat: document.getElementById("chat-modal"),
+        confirmOrder: document.getElementById("confirm-order-modal"),
+        confirmDelivery: document.getElementById("delivery-confirm-modal"),
+        privacy: document.getElementById("privacy-modal"),
+        admin: document.getElementById("admin-panel")
+    },
+    
+    // Формы
+    forms: {
+        product: document.getElementById("product-form"),
+    },
+    
+    // Элементы форм
+    formElements: {
+        productName: document.getElementById("product-name"),
+        productCategory: document.getElementById("product-category"),
+        productDesc: document.getElementById("product-desc"),
+        productPrice: document.getElementById("product-price"),
+        productMedia: document.getElementById("product-media"),
+        mediaUpload: document.getElementById("media-upload"),
+        mediaPreview: document.getElementById("media-preview"),
+        reviewText: document.getElementById("review-text")
+    },
+    
+    // Элементы чата
+    chatElements: {
+        messages: document.getElementById("chat-messages"),
+        input: document.getElementById("chat-input"),
+        sendBtn: document.getElementById("send-message-btn"),
+        sellerName: document.getElementById("seller-name"),
+        sellerAvatar: document.getElementById("seller-avatar"),
+        sellerRating: document.getElementById("seller-rating")
+    },
+    
+    // Элементы подтверждения заказа
+    orderElements: {
+        productName: document.getElementById("order-product-name"),
+        productPrice: document.getElementById("order-product-price"),
+        seller: document.getElementById("order-seller"),
+        total: document.getElementById("order-total"),
+        confirmBtn: document.getElementById("confirm-order-btn")
+    },
+    
+    // Элементы админ-панели
+    adminElements: {
+        productsList: document.getElementById("admin-products-list"),
+        ordersList: document.getElementById("admin-orders-list"),
+        totalProducts: document.getElementById("total-products"),
+        blockedProducts: document.getElementById("blocked-products"),
+        totalUsers: document.getElementById("total-users")
+    },
+    
+    // Табы
+    tabs: {
+        all: document.getElementById("all-products-tab"),
+        categories: document.getElementById("categories-tab")
+    },
+    
+    // Кнопки табов
+    tabButtons: document.querySelectorAll(".marketplace-tab"),
+    
+    // Категории
+    categoryOptions: document.querySelectorAll(".category-option")
 };
 
-// Инициализация маркетплейса
-function initMarketplace() {
+// Инициализация приложения
+function init() {
     loadData();
     setupEventListeners();
-    checkAdminStatus();
+    checkAuthState();
     renderProducts();
+    renderCategories();
     
     if (!localStorage.getItem("privacyAccepted")) {
-        elements.privacyModal.style.display = "flex";
+        showModal("privacy");
     }
 }
 
@@ -48,269 +123,458 @@ function initMarketplace() {
 function loadData() {
     const savedData = localStorage.getItem(MARKETPLACE_CONFIG.storageKey);
     if (savedData) {
-        marketplaceData = JSON.parse(savedData);
+        try {
+            const data = JSON.parse(savedData);
+            state.products = data.products || [];
+            state.users = data.users || [];
+            state.orders = data.orders || [];
+            state.chats = data.chats || [];
+            state.reviews = data.reviews || [];
+        } catch (e) {
+            console.error("Ошибка загрузки данных:", e);
+        }
+    } else {
+        // Инициализация пустых данных
+        state.products = [];
+        state.users = [];
+        state.orders = [];
+        state.chats = [];
+        state.reviews = [];
     }
 }
 
 // Сохранение данных в localStorage
 function saveData() {
-    localStorage.setItem(
-        MARKETPLACE_CONFIG.storageKey,
-        JSON.stringify(marketplaceData)
-    );
+    const data = {
+        products: state.products,
+        users: state.users,
+        orders: state.orders,
+        chats: state.chats,
+        reviews: state.reviews,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    localStorage.setItem(MARKETPLACE_CONFIG.storageKey, JSON.stringify(data));
 }
 
 // Настройка обработчиков событий
 function setupEventListeners() {
-    // Закрытие модальных окон
-    elements.closeButtons.forEach(btn => {
+    // Кнопки модальных окон
+    document.querySelectorAll(".close-modal").forEach(btn => {
         btn.addEventListener("click", closeAllModals);
     });
-
-    // Политика конфиденциальности
-    elements.acceptPrivacyBtn.addEventListener("click", acceptPrivacy);
-    elements.privacyLinks.forEach(link => {
-        link.addEventListener("click", showPrivacyModal);
+    
+    // Кнопка принятия политики
+    document.getElementById("accept-privacy").addEventListener("click", () => {
+        localStorage.setItem("privacyAccepted", "true");
+        closeAllModals();
     });
-
-    // Добавление товара
+    
+    // Ссылки на политику
+    elements.privacyLinks.forEach(link => {
+        link.addEventListener("click", () => showModal("privacy"));
+    });
+    
+    // Кнопка авторизации
+    elements.authBtn.addEventListener("click", handleAuth);
+    
+    // Кнопка добавления товара
     elements.addProductBtn.addEventListener("click", handleAddProductClick);
-    elements.productForm.addEventListener("submit", handleProductSubmit);
-
+    
+    // Форма добавления товара
+    elements.forms.product.addEventListener("submit", handleProductSubmit);
+    
+    // Загрузка медиа
+    elements.formElements.mediaUpload.addEventListener("click", () => {
+        elements.formElements.productMedia.click();
+    });
+    
+    elements.formElements.productMedia.addEventListener("change", handleMediaUpload);
+    
+    // Перетаскивание файлов
+    elements.formElements.mediaUpload.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        elements.formElements.mediaUpload.style.borderColor = MARKETPLACE_CONFIG.primary;
+    });
+    
+    elements.formElements.mediaUpload.addEventListener("dragleave", () => {
+        elements.formElements.mediaUpload.style.borderColor = "rgba(255, 255, 255, 0.2)";
+    });
+    
+    elements.formElements.mediaUpload.addEventListener("drop", (e) => {
+        e.preventDefault();
+        elements.formElements.mediaUpload.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        
+        if (e.dataTransfer.files.length > 0) {
+            elements.formElements.productMedia.files = e.dataTransfer.files;
+            handleMediaUpload();
+        }
+    });
+    
+    // Чат
+    elements.chatElements.sendBtn.addEventListener("click", sendMessage);
+    elements.chatElements.input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+    });
+    
+    // Подтверждение заказа
+    elements.orderElements.confirmBtn.addEventListener("click", confirmOrder);
+    
+    // Подтверждение получения
+    document.getElementById("confirm-delivery-btn").addEventListener("click", confirmDelivery);
+    
+    // Рейтинг
+    document.querySelectorAll("#rating-stars .fa-star").forEach(star => {
+        star.addEventListener("click", handleRatingClick);
+    });
+    
+    // Поиск и фильтры
+    elements.searchInput.addEventListener("input", renderProducts);
+    elements.categoryFilter.addEventListener("change", renderProducts);
+    elements.sortSelect.addEventListener("change", renderProducts);
+    
+    // Табы
+    elements.tabButtons.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const tabId = tab.getAttribute("data-tab");
+            switchTab(tabId);
+        });
+    });
+    
+    // Категории
+    elements.categoryOptions.forEach(option => {
+        option.addEventListener("click", () => {
+            const category = option.getAttribute("data-category");
+            filterByCategory(category);
+        });
+    });
+    
     // Админ-панель
-    if (elements.adminLink) {
-        elements.adminLink.addEventListener("click", showAdminPanel);
-    }
+    elements.adminLink?.addEventListener("click", showAdminPanel);
+}
 
-    // Поиск и сортировка
-    if (elements.searchInput) {
-        elements.searchInput.addEventListener("input", renderProducts);
-    }
-    if (elements.sortSelect) {
-        elements.sortSelect.addEventListener("change", renderProducts);
+// Управление модальными окнами
+function showModal(modalName) {
+    closeAllModals();
+    elements.modals[modalName].style.display = "flex";
+}
+
+function closeAllModals() {
+    for (const modal in elements.modals) {
+        elements.modals[modal].style.display = "none";
     }
 }
 
-// Регистрация пользователя
-function registerUser() {
-    const tgUsername = prompt("Введите ваш Telegram (@username):");
-    if (!tgUsername) {
-        alert("Укажите юзернейм!");
-        return false;
-    }
-
-    // Проверка формата юзернейма
-    if (!tgUsername.startsWith("@")) {
-        alert("Юзернейм должен начинаться с @");
-        return false;
-    }
-
-    currentUser = tgUsername;
-    alert(`🔐 Ваш юзернейм: ${tgUsername}\nУбедитесь, что он правильный!`);
-    
-    // Проверяем, не админ ли это
-    checkAdminStatus();
-    
-    return true;
-}
-
-// Проверка статуса админа
-function checkAdminStatus() {
-    if (currentUser && currentUser.toLowerCase() === MARKETPLACE_CONFIG.adminUsername.toLowerCase()) {
-        elements.adminLink.style.display = "block";
+// Авторизация пользователя
+function handleAuth() {
+    if (state.currentUser) {
+        // Выход
+        state.currentUser = null;
+        localStorage.removeItem("marketplace_user");
+        checkAuthState();
+        alert("Вы вышли из системы");
     } else {
+        // Вход
+        const tgUsername = prompt("Введите ваш Telegram username (начинается с @):");
+        if (!tgUsername) return;
+        
+        if (!tgUsername.startsWith("@")) {
+            alert("Username должен начинаться с @");
+            return;
+        }
+        
+        state.currentUser = tgUsername;
+        localStorage.setItem("marketplace_user", tgUsername);
+        checkAuthState();
+        
+        // Проверяем, новый ли это пользователь
+        const existingUser = state.users.find(u => u.username === tgUsername);
+        if (!existingUser) {
+            state.users.push({
+                username: tgUsername,
+                joinDate: new Date().toISOString(),
+                rating: 0,
+                reviews: []
+            });
+            saveData();
+        }
+        
+        alert(`Добро пожаловать, ${tgUsername}!`);
+    }
+}
+
+// Проверка состояния авторизации
+function checkAuthState() {
+    const savedUser = localStorage.getItem("marketplace_user");
+    if (savedUser) {
+        state.currentUser = savedUser;
+    }
+    
+    if (state.currentUser) {
+        elements.authText.textContent = state.currentUser;
+        elements.addProductBtn.style.display = "block";
+        
+        // Проверка на админа
+        if (state.currentUser.toLowerCase() === MARKETPLACE_CONFIG.adminUsername.toLowerCase()) {
+            elements.adminLink.style.display = "block";
+        } else {
+            elements.adminLink.style.display = "none";
+        }
+    } else {
+        elements.authText.textContent = "Войти";
+        elements.addProductBtn.style.display = "none";
         elements.adminLink.style.display = "none";
     }
 }
 
 // Обработчик клика на добавление товара
 function handleAddProductClick() {
-    if (!currentUser && !registerUser()) return;
-    elements.addProductModal.style.display = "flex";
+    if (!state.currentUser) {
+        alert("Сначала войдите в систему");
+        return handleAuth();
+    }
+    
+    state.mediaFiles = [];
+    elements.formElements.mediaPreview.innerHTML = "";
+    showModal("addProduct");
+}
+
+// Обработчик загрузки медиа
+function handleMediaUpload() {
+    const files = elements.formElements.productMedia.files;
+    if (!files || files.length === 0) return;
+    
+    // Ограничение количества файлов
+    const remainingSlots = MARKETPLACE_CONFIG.maxMediaFiles - state.mediaFiles.length;
+    if (remainingSlots <= 0) {
+        alert(`Максимум ${MARKETPLACE_CONFIG.maxMediaFiles} файлов`);
+        return;
+    }
+    
+    for (let i = 0; i < Math.min(files.length, remainingSlots); i++) {
+        const file = files[i];
+        const fileType = file.type.split("/")[0];
+        
+        if (fileType !== "image" && fileType !== "video") {
+            alert("Можно загружать только изображения и видео");
+            continue;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            state.mediaFiles.push({
+                type: fileType,
+                data: e.target.result,
+                name: file.name
+            });
+            renderMediaPreview();
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    elements.formElements.productMedia.value = "";
+}
+
+// Рендер превью медиа
+function renderMediaPreview() {
+    elements.formElements.mediaPreview.innerHTML = "";
+    
+    state.mediaFiles.forEach((file, index) => {
+        const previewItem = document.createElement("div");
+        previewItem.className = "preview-item";
+        
+        if (file.type === "image") {
+            previewItem.innerHTML = `
+                <img src="${file.data}" alt="${file.name}">
+                <div class="remove-preview" data-index="${index}">&times;</div>
+            `;
+        } else {
+            previewItem.innerHTML = `
+                <video src="${file.data}"></video>
+                <div class="remove-preview" data-index="${index}">&times;</div>
+            `;
+        }
+        
+        elements.formElements.mediaPreview.appendChild(previewItem);
+    });
+    
+    // Обработчики удаления превью
+    document.querySelectorAll(".remove-preview").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const index = parseInt(btn.getAttribute("data-index"));
+            state.mediaFiles.splice(index, 1);
+            renderMediaPreview();
+            e.stopPropagation();
+        });
+    });
 }
 
 // Обработчик отправки формы товара
 function handleProductSubmit(e) {
     e.preventDefault();
-    const [name, desc, price, seller] = e.target.elements;
     
-    // Валидация данных
-    if (name.value.length < 3) {
+    if (!state.currentUser) {
+        alert("Сначала войдите в систему");
+        return;
+    }
+    
+    // Валидация
+    if (elements.formElements.productName.value.length < 3) {
         alert("Название должно быть не короче 3 символов");
         return;
     }
     
-    if (desc.value.length < 10) {
+    if (elements.formElements.productDesc.value.length < 10) {
         alert("Описание должно быть не короче 10 символов");
         return;
     }
     
-    if (parseFloat(price.value) <= 0) {
-        alert("Цена должна быть больше 0");
+    if (!elements.formElements.productCategory.value) {
+        alert("Выберите категорию");
         return;
     }
     
-    if (!seller.value.startsWith("@")) {
-        alert("Юзернейм должен начинаться с @");
+    const price = parseFloat(elements.formElements.productPrice.value);
+    if (isNaN(price) || price <= 0) {
+        alert("Укажите корректную цену");
         return;
     }
-
-    // Добавление товара
+    
+    // Создание товара
     const newProduct = {
-        id: Date.now(),
-        name: name.value,
-        desc: desc.value,
-        price: parseFloat(price.value).toFixed(2),
-        seller: seller.value,
+        id: Date.now().toString(),
+        name: elements.formElements.productName.value,
+        description: elements.formElements.productDesc.value,
+        category: elements.formElements.productCategory.value,
+        price: price.toFixed(2),
+        seller: state.currentUser,
+        media: [...state.mediaFiles],
         date: new Date().toISOString(),
         isBlocked: false,
-        rating: 0,
-        reviews: []
+        rating: 0
     };
-
-    marketplaceData.products.push(newProduct);
+    
+    state.products.push(newProduct);
     saveData();
     renderProducts();
-    elements.addProductModal.style.display = "none";
-    e.target.reset();
+    closeAllModals();
     
     alert("Товар успешно добавлен!");
+    e.target.reset();
+    state.mediaFiles = [];
 }
 
-// Рендер списка товаров
+// Рендер товаров
 function renderProducts() {
-    let productsToDisplay = [...marketplaceData.products];
+    let productsToDisplay = [...state.products];
     
     // Фильтрация заблокированных
     productsToDisplay = productsToDisplay.filter(p => !p.isBlocked);
     
     // Поиск
-    if (elements.searchInput && elements.searchInput.value) {
-        const searchTerm = elements.searchInput.value.toLowerCase();
+    const searchTerm = elements.searchInput.value.toLowerCase();
+    if (searchTerm) {
         productsToDisplay = productsToDisplay.filter(p => 
             p.name.toLowerCase().includes(searchTerm) || 
-            p.desc.toLowerCase().includes(searchTerm)
+            p.description.toLowerCase().includes(searchTerm) ||
+            p.seller.toLowerCase().includes(searchTerm)
         );
     }
     
+    // Фильтр по категории
+    const categoryFilter = elements.categoryFilter.value;
+    if (categoryFilter) {
+        productsToDisplay = productsToDisplay.filter(p => p.category === categoryFilter);
+    }
+    
     // Сортировка
-    if (elements.sortSelect) {
-        switch (elements.sortSelect.value) {
-            case "price-asc":
-                productsToDisplay.sort((a, b) => a.price - b.price);
-                break;
-            case "price-desc":
-                productsToDisplay.sort((a, b) => b.price - a.price);
-                break;
-            case "newest":
-                productsToDisplay.sort((a, b) => new Date(b.date) - new Date(a.date));
-                break;
-        }
+    switch (elements.sortSelect.value) {
+        case "price-asc":
+            productsToDisplay.sort((a, b) => a.price - b.price);
+            break;
+        case "price-desc":
+            productsToDisplay.sort((a, b) => b.price - a.price);
+            break;
+        case "rating":
+            productsToDisplay.sort((a, b) => b.rating - a.rating);
+            break;
+        case "newest":
+        default:
+            productsToDisplay.sort((a, b) => new Date(b.date) - new Date(a.date));
     }
     
     // Отрисовка
-    elements.accountList.innerHTML = productsToDisplay
-        .map(product => `
-            <div class="account-card" data-id="${product.id}">
-                <h3>${product.name}</h3>
-                <p>${product.desc}</p>
-                <p class="price">💰 ${product.price}${MARKETPLACE_CONFIG.currency}</p>
-                <div class="product-meta">
-                    <p class="seller">👤 Продавец: <a href="https://t.me/${product.seller.replace("@", "")}" target="_blank">${product.seller}</a></p>
-                    <small>${new Date(product.date).toLocaleDateString()}</small>
-                </div>
-                <div class="product-actions">
-                    <button class="btn" onclick="handleBuyClick('${product.seller}')">Купить</button>
-                    ${currentUser === product.seller ? `<button class="btn danger" onclick="handleDeleteProduct(${product.id})">Удалить</button>` : ''}
+    if (productsToDisplay.length === 0) {
+        elements.productsGrid.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h3>Товаров не найдено</h3>
+                <p>Попробуйте изменить параметры поиска</p>
+            </div>
+        `;
+    } else {
+        elements.productsGrid.innerHTML = productsToDisplay.map(product => `
+            <div class="product-card" data-id="${product.id}">
+                ${product.media.length > 0 ? `
+                    <div class="product-media">
+                        ${product.media[0].type === "image" ? 
+                            `<img src="${product.media[0].data}" alt="${product.name}">` : 
+                            `<video src="${product.media[0].data}" controls></video>`}
+                        <div class="product-badge">${getCategoryName(product.category)}</div>
+                    </div>
+                ` : `
+                    <div class="product-media">
+                        <div class="media-placeholder">
+                            <i class="${getCategoryIcon(product.category)}"></i>
+                        </div>
+                        <div class="product-badge">${getCategoryName(product.category)}</div>
+                    </div>
+                `}
+                <div class="product-content">
+                    <h3 class="product-title">${product.name}</h3>
+                    <p class="product-description">${product.description}</p>
+                    <div class="product-price">${product.price}${MARKETPLACE_CONFIG.currency}</div>
+                    <div class="product-meta">
+                        <div class="product-seller">
+                            <img src="${MARKETPLACE_CONFIG.defaultAvatar}" alt="Seller">
+                            <span>${product.seller}</span>
+                        </div>
+                        <small>${new Date(product.date).toLocaleDateString()}</small>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn" onclick="viewProduct('${product.id}')">
+                            <i class="fas fa-eye"></i> Подробнее
+                        </button>
+                    </div>
                 </div>
             </div>
         `).join("");
-}
-
-// Показать админ-панель
-function showAdminPanel(e) {
-    if (e) e.preventDefault();
-    
-    if (currentUser !== MARKETPLACE_CONFIG.adminUsername) {
-        alert("Доступ запрещен!");
-        return;
     }
-    
-    elements.adminPanel.style.display = "flex";
-    renderAdminPanel();
 }
 
-// Рендер админ-панели
-function renderAdminPanel() {
-    elements.totalProducts.textContent = marketplaceData.products.length;
-    elements.blockedProducts.textContent = marketplaceData.products.filter(p => p.isBlocked).length;
+// Просмотр товара
+function viewProduct(productId) {
+    const product = state.products.find(p => p.id === productId);
+    if (!product) return;
     
-    elements.adminProductsList.innerHTML = marketplaceData.products
-        .map(product => `
-            <div class="admin-product-card" data-id="${product.id}">
-                <h4>${product.name} (${product.price}${MARKETPLACE_CONFIG.currency})</h4>
-                <p>${product.desc}</p>
-                <div class="admin-product-meta">
-                    <span>Продавец: ${product.seller}</span>
-                    <span>Дата: ${new Date(product.date).toLocaleDateString()}</span>
-                </div>
-                <div class="admin-product-actions">
-                    <button onclick="toggleBlockProduct(${product.id})">
-                        ${product.isBlocked ? "Разблокировать" : "Заблокировать"}
-                    </button>
-                    <button class="danger" onclick="deleteProduct(${product.id})">Удалить</button>
-                </div>
+    state.currentProduct = product;
+    
+    // Отрисовка модального окна товара
+    document.getElementById("view-product-title").textContent = product.name;
+    
+    const content = document.getElementById("view-product-content");
+    content.innerHTML = `
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <div style="flex: 1;">
+                ${product.media.length > 0 ? product.media.map(media => 
+                    media.type === "image" ? 
+                        `<img src="${media.data}" alt="${product.name}" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">` :
+                        `<video src="${media.data}" controls style="width: 100%; border-radius: 8px; margin-bottom: 10px;"></video>`
+                ).join("") : `
+                    <div style="background: var(--darker); height: 200px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                        <i class="${getCategoryIcon(product.category)}" style="font-size: 50px; color: var(--gray);"></i>
+                    </div>
+                `}
             </div>
-        `).join("");
-}
-
-// Управление товарами (глобальные функции для использования в HTML)
-window.handleBuyClick = (seller) => {
-    alert(`Свяжитесь с ${seller} в Telegram для покупки.`);
-};
-
-window.toggleBlockProduct = (id) => {
-    marketplaceData.products = marketplaceData.products.map(p => 
-        p.id === id ? {...p, isBlocked: !p.isBlocked} : p
-    );
-    saveData();
-    renderProducts();
-    renderAdminPanel();
-};
-
-window.deleteProduct = (id) => {
-    if (confirm("Вы уверены, что хотите удалить этот товар?")) {
-        marketplaceData.products = marketplaceData.products.filter(p => p.id !== id);
-        saveData();
-        renderProducts();
-        renderAdminPanel();
-    }
-};
-
-window.handleDeleteProduct = (id) => {
-    if (confirm("Вы уверены, что хотите удалить свой товар?")) {
-        marketplaceData.products = marketplaceData.products.filter(p => p.id !== id);
-        saveData();
-        renderProducts();
-    }
-};
-
-// Вспомогательные функции
-function closeAllModals() {
-    elements.addProductModal.style.display = "none";
-    elements.privacyModal.style.display = "none";
-    elements.adminPanel.style.display = "none";
-}
-
-function acceptPrivacy() {
-    localStorage.setItem("privacyAccepted", "true");
-    elements.privacyModal.style.display = "none";
-}
-
-function showPrivacyModal() {
-    elements.privacyModal.style.display = "flex";
-}
-
-// Запуск маркетплейса
-let currentUser = localStorage.getItem("marketplace_user") || null;
-initMarketplace();
+            <div style="flex: 1;">
+                <h3 style="m
