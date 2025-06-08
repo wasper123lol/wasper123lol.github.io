@@ -147,14 +147,28 @@
         </div>
     </div>
 
-    <!-- Админ-панель (скрыта по умолчанию) -->
-    <div id="admin-panel" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>👑 Админ-панель</h2>
-            <div id="admin-products-list"></div>
+    <!-- Добавьте этот div перед закрывающим </main> -->
+<div class="marketplace-controls">
+    <input type="text" id="search-input" placeholder="Поиск товаров...">
+    <select id="sort-select">
+        <option value="price-asc">Цена (по возрастанию)</option>
+        <option value="price-desc">Цена (по убыванию)</option>
+        <option value="newest">Сначала новые</option>
+    </select>
+</div>
+
+<!-- Обновите модальное окно админа -->
+<div id="admin-panel" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>👑 Админ-панель</h2>
+        <div class="admin-stats">
+            <p>Всего товаров: <span id="total-products">0</span></p>
+            <p>Заблокировано: <span id="blocked-products">0</span></p>
         </div>
+        <div id="admin-products-list"></div>
     </div>
+</div>
 
     <script src="script.js"></script>
 </body>
